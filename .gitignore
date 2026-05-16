@@ -1,0 +1,7 @@
+Include/*
+Lib/*
+Library/*
+Scripts/*
+share/*
+pyvenv.cfg
+.vscode/*
