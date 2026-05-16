@@ -8,6 +8,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from tensorflow.keras.losses import Huber
 import os
+import keras
 import matplotlib.pyplot as plt
 import matplotlib
 import joblib
@@ -86,17 +87,25 @@ def index():
 
     return render_template('index.html', result=None, display_list=None, error=None, months=None)
 
+def custom_attention_deserializer(**kwargs):
+    # If score_mode came in as a function object, force it back to 'dot'
+    if 'score_mode' in kwargs and not isinstance(kwargs['score_mode'], str):
+        kwargs['score_mode'] = 'dot'
+        
+    # Reconstruct the Attention layer using the cleaned parameters
+    return keras.layers.Attention(**kwargs)
+
 @app.route('/predict', methods=['POST'])
 def predict():
 
     #csv_path = os.path.join(app.config['UPLOAD_FOLDER'], 'Training_Data_Weekly_2024.csv')
 
     # Load the model and scaler
-    model_path = '/home/Dengue_Gui/content/saved_model/best_model.h5'
-    scaler_path = '/home/Dengue_Gui/content/saved_model/scaler.pkl'
+    model_path = '/workspaces/Dengue_Gui/content/saved_model/best_model.h5'
+    scaler_path = '/workspaces/Dengue_Gui/content/saved_model/scaler.pkl'
 
     try:
-      model = load_model(model_path, custom_objects={'Huber': Huber})
+      model = load_model(model_path, custom_objects={'Huber': Huber, 'Attention': custom_attention_deserializer})
       with open(scaler_path, 'rb') as f:
           scaler = joblib.load(f)
       print("Model and scaler loaded successfully.")
@@ -237,11 +246,11 @@ def draw_image(districts,param,filename):
 
 def permutation_importance():
 
-    model_path = '/home/Dengue_Gui/content/saved_model/best_model.h5'
-    scaler_path = '/home/Dengue_Gui/content/saved_model/scaler.pkl'
+    model_path = '/workspaces/Dengue_Gui/content/saved_model/best_model.h5'
+    scaler_path = '/workspaces/Dengue_Gui/content/saved_model/scaler.pkl'
 
     try:
-      model = load_model(model_path, custom_objects={'Huber': Huber})
+      model = load_model(model_path, custom_objects={'Huber': Huber, 'Attention': custom_attention_deserializer})
       with open(scaler_path, 'rb') as f:
           scaler = joblib.load(f)
       print("Model and scaler loaded successfully.")

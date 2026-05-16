@@ -5,3 +5,5 @@ Scripts/*
 share/*
 pyvenv.cfg
 .vscode/*
+.venv/*
+.devcontainer/*
